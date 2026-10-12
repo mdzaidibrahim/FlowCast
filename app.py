@@ -14,7 +14,7 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 
-from src.data.preprocess import classify_traffic
+from src.data.preprocess import build_x_flat_from_inputs, classify_traffic
 from src.models.predict import FlowCastPredictor
 
 # Set page configuration
@@ -86,9 +86,10 @@ def load_predictor():
 
 @st.cache_data
 def load_metrics_and_samples():
-    """Load cached experiment metrics and sample demonstration inputs."""
+    """Load cached experiment metrics, sample demonstration inputs, and sensor metadata."""
     metrics_file = Path("artifacts/metrics/metrics_summary.json")
     samples_file = Path("artifacts/outputs/demo_samples.json")
+    meta_file = Path("artifacts/outputs/sensor_metadata.json")
 
     metrics_data = {}
     if metrics_file.exists():
@@ -100,12 +101,35 @@ def load_metrics_and_samples():
         with open(samples_file, "r") as f:
             samples_data = json.load(f)
 
-    return metrics_data, samples_data
+    sensor_metadata = {}
+    if meta_file.exists():
+        with open(meta_file, "r") as f:
+            sensor_metadata = json.load(f)
+    else:
+        # Fallback to dataset extraction if json does not exist
+        try:
+            from src.data.load_data import load_raw_traffic_data
+
+            raw = load_raw_traffic_data()
+            X0 = raw["X_tr_raw"][0]
+            sensor_metadata = {
+                "num_lanes": X0[:, 39].astype(int).tolist(),
+                "road_direction": np.argmax(X0[:, 40:44], axis=1).tolist(),
+                "road_id": np.argmax(X0[:, 44:48], axis=1).tolist(),
+            }
+        except Exception:
+            sensor_metadata = {
+                "num_lanes": [3] * 36,
+                "road_direction": [0] * 36,
+                "road_id": [0] * 36,
+            }
+
+    return metrics_data, samples_data, sensor_metadata
 
 
 def main():
     predictor = load_predictor()
-    metrics_data, samples_data = load_metrics_and_samples()
+    metrics_data, samples_data, sensor_metadata = load_metrics_and_samples()
 
     # Sidebar controls
     st.sidebar.image(
@@ -133,19 +157,32 @@ def main():
     )
 
     if nav_option == "Live Forecasting Dashboard":
-        render_forecasting_dashboard(predictor, samples_data, active_model, focal_sensor)
+        render_forecasting_dashboard(predictor, samples_data, sensor_metadata, active_model, focal_sensor)
     elif nav_option == "Model Comparison & Diagnostics":
         render_model_comparison(metrics_data)
     else:
         render_architecture_and_audit(metrics_data)
 
 
-def render_forecasting_dashboard(predictor, samples_data, active_model, focal_sensor):
+def render_forecasting_dashboard(predictor, samples_data, sensor_metadata, active_model, focal_sensor):
     st.markdown('<div class="main-title">FlowCast: Short-Horizon Traffic Forecasting</div>', unsafe_allow_html=True)
     st.markdown(
         '<div class="sub-title">Multi-Output 15-Minute Urban Arterial Volume Prediction & Congestion Band Classification</div>',
         unsafe_allow_html=True,
     )
+
+    # Concise How to Use Guide
+    with st.expander("ℹ️ How to Use FlowCast & System Scope", expanded=False):
+        st.markdown(
+            """
+            **System Overview & Purpose:**
+            - **Prototype Scope:** FlowCast is a reproducible machine learning benchmark developed on historical California highway loop detector data (UCI Traffic Flow Forecasting Dataset #734). It is an offline research prototype, not a real-time municipal traffic signal controller or a model validated on Indian arterial networks.
+            - **15-Minute Lookahead Prediction:** Given 10 consecutive historical observations (2.5 hours at 15-minute intervals) and calendar context, FlowCast simultaneously forecasts traffic volume for all 36 network sensors 15 minutes into the future ($t+1$).
+            - **Volume Category Bands:** Continuous predictions in $[0.0, 1.0]$ are translated into three operational bands (**Low**, **Moderate**, **High**) using empirical tertile boundaries derived strictly from the training split.
+            - **Demonstration Ground Truth:** In *Bundled Demonstration Mode*, ground truth ($y_{true}$) is loaded from held-out test steps to show exact prediction error ($\Delta$). In *Custom Scenario* and *CSV Input*, predictions reflect synthetic or user-supplied sequences without pre-existing ground truth.
+            - **Model Comparison:** Compare the deep learning model (**FlowCast GRU** with contextual MLP) against the competitive **Random Forest Baseline** using the sidebar screen selector.
+            """
+        )
 
     # Input method selection
     tab_demo, tab_custom, tab_upload = st.tabs(["🚀 Bundled Demonstration Mode", "⚙️ Custom Scenario Builder", "📂 CSV Batch Input"])
@@ -172,7 +209,7 @@ def render_forecasting_dashboard(predictor, samples_data, active_model, focal_se
             x_ctx = np.zeros(29, dtype=np.float32)
             x_ctx[0] = 1.0  # Monday
             x_ctx[17] = 1.0  # Hour 12
-            x_flat = np.zeros(1728, dtype=np.float32)
+            x_flat = build_x_flat_from_inputs(x_seq, x_ctx, sensor_metadata)
 
     with tab_custom:
         st.write("Manually configure contextual time and focal sensor history.")
@@ -192,12 +229,10 @@ def render_forecasting_dashboard(predictor, samples_data, active_model, focal_se
             day_map = {"Monday": 0, "Tuesday": 1, "Wednesday": 2, "Thursday": 3, "Friday": 4}
             x_ctx[day_map[sel_day]] = 1.0
             x_ctx[5 + sel_hour] = 1.0
-            x_flat = np.zeros(1728, dtype=np.float32)
-            x_flat[:360] = x_seq.T.flatten()
-            x_flat[360:389] = x_ctx
+            x_flat = build_x_flat_from_inputs(x_seq, x_ctx, sensor_metadata)
 
     with tab_upload:
-        st.write("Upload a CSV file containing historical readings. Format: at least 10 historical values or 36 sensor columns.")
+        st.write("Upload a CSV file containing historical readings. Format: at least 10 historical values and 36 sensor columns.")
         uploaded_file = st.file_uploader("Upload Input CSV", type=["csv"])
         if uploaded_file is not None:
             try:
@@ -206,9 +241,9 @@ def render_forecasting_dashboard(predictor, samples_data, active_model, focal_se
                 if df.shape[1] >= 36 and len(df) >= 10:
                     x_seq = df.iloc[:10, :36].values.astype(np.float32)
                     x_ctx = np.zeros(29, dtype=np.float32)
-                    x_ctx[0] = 1.0
-                    x_ctx[13] = 1.0
-                    x_flat = np.zeros(1728, dtype=np.float32)
+                    x_ctx[0] = 1.0  # Default Monday
+                    x_ctx[13] = 1.0  # Default 08:00 AM
+                    x_flat = build_x_flat_from_inputs(x_seq, x_ctx, sensor_metadata)
                 else:
                     st.error("Uploaded CSV must have at least 10 rows and 36 sensor columns.")
             except Exception as e:

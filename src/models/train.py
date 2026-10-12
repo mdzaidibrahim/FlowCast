@@ -290,9 +290,21 @@ def run_pipeline() -> Dict[str, Any]:
     )
     logger.info("Generated all diagnostic plots in %s", fig_dir)
 
-    # 8. Save Sample Test Demonstrations for Instant Streamlit Loading
+    # 8. Save Sample Test Demonstrations and Sensor Metadata for Streamlit Loading
     out_dir = Path("artifacts/outputs")
     out_dir.mkdir(parents=True, exist_ok=True)
+
+    # Save sensor metadata for exact flattened feature reconstruction
+    raw_data = load_raw_traffic_data()
+    X0 = raw_data["X_tr_raw"][0]
+    sensor_meta = {
+        "num_lanes": X0[:, 39].astype(int).tolist(),
+        "road_direction": np.argmax(X0[:, 40:44], axis=1).tolist(),
+        "road_id": np.argmax(X0[:, 44:48], axis=1).tolist(),
+    }
+    with open(out_dir / "sensor_metadata.json", "w") as f:
+        json.dump(sensor_meta, f, indent=2)
+
     sample_data = {
         "sample_indices": [0, 50, 100, 200, 300, 400],
         "thresholds": [float(splits.thresholds[0]), float(splits.thresholds[1])],
@@ -314,7 +326,7 @@ def run_pipeline() -> Dict[str, Any]:
         )
     with open(out_dir / "demo_samples.json", "w") as f:
         json.dump(sample_data, f)
-    logger.info("Saved demonstration samples to %s/demo_samples.json", out_dir)
+    logger.info("Saved demonstration samples and sensor metadata to %s", out_dir)
 
     return metrics_data
 

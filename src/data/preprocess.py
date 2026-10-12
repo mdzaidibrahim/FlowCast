@@ -102,6 +102,67 @@ def extract_features(
     return X_seq, X_ctx, X_flat
 
 
+def build_x_flat_from_inputs(
+    x_seq: np.ndarray,
+    x_ctx: np.ndarray,
+    sensor_metadata: Dict[str, np.ndarray],
+) -> np.ndarray:
+    """Assemble the correct 1728-element flattened feature vector for RF inference.
+
+    The Random Forest was trained on ``X_raw.reshape(N, 1728)`` where
+    ``X_raw[n, s, :]`` is the 48-element per-sensor vector::
+
+        [lag0..lag9,          # cols 0:10   – 10 historical volume lags
+         day0..day4,          # cols 10:15  – 5 weekday one-hot flags
+         hour0..hour23,       # cols 15:39  – 24 hour-of-day one-hot flags
+         num_lanes,           # col  39     – integer lane count
+         dir0..dir3,          # cols 40:44  – road direction one-hot
+         id0..id3]            # cols 44:48  – road segment ID one-hot
+
+    Therefore sensor *s* occupies ``x_flat[s*48 : (s+1)*48]``.
+    This function assembles the vector correctly so that synthetic or
+    user-provided inputs are placed at the exact positions the RF expects.
+
+    Args:
+        x_seq: Shape ``(10, 36)`` — 10 historical volume lags for all 36 sensors.
+        x_ctx: Shape ``(29,)`` — 5 weekday + 24 hour-of-day one-hot features.
+        sensor_metadata: Dict with keys ``'num_lanes'``, ``'road_direction'``,
+            ``'road_id'`` (each length-36 integer array from the training dataset).
+
+    Returns:
+        x_flat: Shape ``(1728,)`` array matching the RF training layout.
+    """
+    num_sensors = 36
+    num_features = 48
+    x_flat = np.zeros(num_sensors * num_features, dtype=np.float32)
+
+    num_lanes = sensor_metadata.get("num_lanes", np.zeros(num_sensors, dtype=int))
+    road_dir = sensor_metadata.get("road_direction", np.zeros(num_sensors, dtype=int))
+    road_id = sensor_metadata.get("road_id", np.zeros(num_sensors, dtype=int))
+
+    for s in range(num_sensors):
+        base = s * num_features
+        # Cols 0:10 — historical lags (most recent = lag at t, oldest = t-9)
+        x_flat[base:base + 10] = x_seq[:, s]
+        # Cols 10:15 — weekday one-hot (same across all sensors)
+        x_flat[base + 10:base + 15] = x_ctx[:5]
+        # Cols 15:39 — hour-of-day one-hot (same across all sensors)
+        x_flat[base + 15:base + 39] = x_ctx[5:29]
+        # Col 39 — number of lanes (sensor-specific static feature)
+        x_flat[base + 39] = float(num_lanes[s])
+        # Cols 40:44 — road direction one-hot (sensor-specific)
+        dir_idx = int(road_dir[s])
+        if 0 <= dir_idx < 4:
+            x_flat[base + 40 + dir_idx] = 1.0
+        # Cols 44:48 — road segment ID one-hot (sensor-specific)
+        id_idx = int(road_id[s])
+        if 0 <= id_idx < 4:
+            x_flat[base + 44 + id_idx] = 1.0
+
+    return x_flat
+
+
+
 def prepare_data_splits(
     val_size: int = 200,
     raw_dir: Path | str = "data/raw",
