@@ -21,6 +21,9 @@ data/raw/*
 artifacts/models/*
 !artifacts/models/.gitkeep
 
+# Outputs directory contents (auto-generated)
+outputs/
+
 # Local evaluation & private assignment notes
 docs/*.pdf
 docs/Decisions&guidelines.md
@@ -31,5 +34,7 @@ docs/sample_report.md
 .DS_Store
 .idea/
 .vscode/
+.agents/
+.claude/
 *.swp
 *.swo

@@ -1,0 +1,20 @@
+Model Family,Trial ID,Parameters,Val MAE,Val RMSE,Val R2,Fit Time (s)
+RandomForest,RF_01,"{""n_estimators"": 50, ""max_depth"": 10, ""max_features"": ""sqrt""}",0.02217,0.03348,0.97159,0.06
+RandomForest,RF_02,"{""n_estimators"": 50, ""max_depth"": 14, ""max_features"": ""sqrt""}",0.02214,0.03374,0.97113,0.1
+RandomForest,RF_03,"{""n_estimators"": 50, ""max_depth"": 18, ""max_features"": ""sqrt""}",0.02240,0.03380,0.97103,0.05
+RandomForest,RF_04,"{""n_estimators"": 100, ""max_depth"": 10, ""max_features"": ""sqrt""}",0.02201,0.03318,0.97209,0.09
+RandomForest,RF_05,"{""n_estimators"": 100, ""max_depth"": 14, ""max_features"": ""sqrt""}",0.02174,0.03310,0.97222,0.09
+RandomForest,RF_06,"{""n_estimators"": 100, ""max_depth"": 18, ""max_features"": ""sqrt""}",0.02168,0.03296,0.97246,0.1
+RandomForest,RF_07,"{""n_estimators"": 150, ""max_depth"": 14, ""max_features"": ""sqrt""}",0.02168,0.03300,0.97239,0.14
+RandomForest,RF_08,"{""n_estimators"": 100, ""max_depth"": 14, ""max_features"": 0.5}",0.02198,0.03330,0.97189,1.07
+RandomForest,RF_09,"{""n_estimators"": 100, ""max_depth"": 18, ""max_features"": 0.5}",0.02182,0.03324,0.97199,1.05
+RandomForest,RF_10,"{""n_estimators"": 100, ""max_depth"": 14, ""max_features"": 1.0}",0.02206,0.03347,0.97160,1.99
+RandomForest,RF_11,"{""n_estimators"": 150, ""max_depth"": 18, ""max_features"": 0.5}",0.02191,0.03328,0.97192,1.56
+FlowCastGRU,GRU_Lightweight_1L,"{""trial_name"": ""GRU_Lightweight_1L"", ""hidden_dim"": 32, ""num_layers"": 1, ""context_dim"": 16, ""dropout"": 0.1, ""lr"": 0.003, ""batch_size"": 32}",0.03022,0.04163,0.95607,10.21
+FlowCastGRU,GRU_Standard_1L,"{""trial_name"": ""GRU_Standard_1L"", ""hidden_dim"": 64, ""num_layers"": 1, ""context_dim"": 32, ""dropout"": 0.15, ""lr"": 0.002, ""batch_size"": 32}",0.03039,0.04165,0.95602,5.15
+FlowCastGRU,GRU_Deep_2L_Baseline,"{""trial_name"": ""GRU_Deep_2L_Baseline"", ""hidden_dim"": 64, ""num_layers"": 2, ""context_dim"": 32, ""dropout"": 0.15, ""lr"": 0.002, ""batch_size"": 32}",0.02945,0.04089,0.95761,14.1
+FlowCastGRU,GRU_HighRegularization_2L,"{""trial_name"": ""GRU_HighRegularization_2L"", ""hidden_dim"": 64, ""num_layers"": 2, ""context_dim"": 32, ""dropout"": 0.25, ""lr"": 0.001, ""batch_size"": 32}",0.02989,0.04176,0.95579,12.82
+FlowCastGRU,GRU_HighCapacity_2L,"{""trial_name"": ""GRU_HighCapacity_2L"", ""hidden_dim"": 128, ""num_layers"": 2, ""context_dim"": 32, ""dropout"": 0.2, ""lr"": 0.002, ""batch_size"": 32}",0.02974,0.04112,0.95713,12.73
+FlowCastGRU,GRU_SmallBatch_2L,"{""trial_name"": ""GRU_SmallBatch_2L"", ""hidden_dim"": 64, ""num_layers"": 2, ""context_dim"": 32, ""dropout"": 0.15, ""lr"": 0.002, ""batch_size"": 16}",0.03007,0.04108,0.95721,17.64
+FlowCastGRU,GRU_Compact_2L,"{""trial_name"": ""GRU_Compact_2L"", ""hidden_dim"": 32, ""num_layers"": 2, ""context_dim"": 16, ""dropout"": 0.1, ""lr"": 0.002, ""batch_size"": 32}",0.03010,0.04142,0.95651,9.94
+FlowCastGRU,GRU_Wide_1L_LowLR,"{""trial_name"": ""GRU_Wide_1L_LowLR"", ""hidden_dim"": 128, ""num_layers"": 1, ""context_dim"": 32, ""dropout"": 0.15, ""lr"": 0.001, ""batch_size"": 32}",0.02949,0.04109,0.95720,9.49

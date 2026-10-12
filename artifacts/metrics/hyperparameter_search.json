@@ -1,0 +1,305 @@
+{
+  "selected_rf_config": {
+    "n_estimators": 100,
+    "max_depth": 18,
+    "max_features": "sqrt"
+  },
+  "selected_gru_config": {
+    "trial_name": "GRU_Deep_2L_Baseline",
+    "hidden_dim": 64,
+    "num_layers": 2,
+    "context_dim": 32,
+    "dropout": 0.15,
+    "lr": 0.002,
+    "batch_size": 32
+  },
+  "all_trials": [
+    {
+      "model_family": "RandomForest",
+      "trial_id": "RF_01",
+      "params": {
+        "n_estimators": 50,
+        "max_depth": 10,
+        "max_features": "sqrt"
+      },
+      "val_mae": 0.02217207983944322,
+      "val_rmse": 0.03347702918698961,
+      "val_r2": 0.9715855205135259,
+      "fit_time_sec": 0.06
+    },
+    {
+      "model_family": "RandomForest",
+      "trial_id": "RF_02",
+      "params": {
+        "n_estimators": 50,
+        "max_depth": 14,
+        "max_features": "sqrt"
+      },
+      "val_mae": 0.02214233764448529,
+      "val_rmse": 0.033743667637596626,
+      "val_r2": 0.9711310856209863,
+      "fit_time_sec": 0.1
+    },
+    {
+      "model_family": "RandomForest",
+      "trial_id": "RF_03",
+      "params": {
+        "n_estimators": 50,
+        "max_depth": 18,
+        "max_features": "sqrt"
+      },
+      "val_mae": 0.022398383320267532,
+      "val_rmse": 0.03380373924628755,
+      "val_r2": 0.9710282073097759,
+      "fit_time_sec": 0.05
+    },
+    {
+      "model_family": "RandomForest",
+      "trial_id": "RF_04",
+      "params": {
+        "n_estimators": 100,
+        "max_depth": 10,
+        "max_features": "sqrt"
+      },
+      "val_mae": 0.022008041609344747,
+      "val_rmse": 0.03317688736646965,
+      "val_r2": 0.9720927424979042,
+      "fit_time_sec": 0.09
+    },
+    {
+      "model_family": "RandomForest",
+      "trial_id": "RF_05",
+      "params": {
+        "n_estimators": 100,
+        "max_depth": 14,
+        "max_features": "sqrt"
+      },
+      "val_mae": 0.021740185014668453,
+      "val_rmse": 0.03310379045819611,
+      "val_r2": 0.9722155802420751,
+      "fit_time_sec": 0.09
+    },
+    {
+      "model_family": "RandomForest",
+      "trial_id": "RF_06",
+      "params": {
+        "n_estimators": 100,
+        "max_depth": 18,
+        "max_features": "sqrt"
+      },
+      "val_mae": 0.021677839775750767,
+      "val_rmse": 0.032955111159808925,
+      "val_r2": 0.9724645965181596,
+      "fit_time_sec": 0.1
+    },
+    {
+      "model_family": "RandomForest",
+      "trial_id": "RF_07",
+      "params": {
+        "n_estimators": 150,
+        "max_depth": 14,
+        "max_features": "sqrt"
+      },
+      "val_mae": 0.02168261610056266,
+      "val_rmse": 0.03299725321601059,
+      "val_r2": 0.972394128513503,
+      "fit_time_sec": 0.14
+    },
+    {
+      "model_family": "RandomForest",
+      "trial_id": "RF_08",
+      "params": {
+        "n_estimators": 100,
+        "max_depth": 14,
+        "max_features": 0.5
+      },
+      "val_mae": 0.021982698475577694,
+      "val_rmse": 0.03329622501226484,
+      "val_r2": 0.9718916159670651,
+      "fit_time_sec": 1.07
+    },
+    {
+      "model_family": "RandomForest",
+      "trial_id": "RF_09",
+      "params": {
+        "n_estimators": 100,
+        "max_depth": 18,
+        "max_features": 0.5
+      },
+      "val_mae": 0.021823251020156347,
+      "val_rmse": 0.03323763900429678,
+      "val_r2": 0.9719904445425452,
+      "fit_time_sec": 1.05
+    },
+    {
+      "model_family": "RandomForest",
+      "trial_id": "RF_10",
+      "params": {
+        "n_estimators": 100,
+        "max_depth": 14,
+        "max_features": 1.0
+      },
+      "val_mae": 0.022063963350830003,
+      "val_rmse": 0.033468423143270046,
+      "val_r2": 0.971600127832444,
+      "fit_time_sec": 1.99
+    },
+    {
+      "model_family": "RandomForest",
+      "trial_id": "RF_11",
+      "params": {
+        "n_estimators": 150,
+        "max_depth": 18,
+        "max_features": 0.5
+      },
+      "val_mae": 0.02191006004513057,
+      "val_rmse": 0.033277135565475326,
+      "val_r2": 0.9719238370183425,
+      "fit_time_sec": 1.56
+    },
+    {
+      "model_family": "FlowCastGRU",
+      "trial_id": "GRU_Lightweight_1L",
+      "params": {
+        "trial_name": "GRU_Lightweight_1L",
+        "hidden_dim": 32,
+        "num_layers": 1,
+        "context_dim": 16,
+        "dropout": 0.1,
+        "lr": 0.003,
+        "batch_size": 32
+      },
+      "val_mae": 0.030219174921512604,
+      "val_rmse": 0.04162616394090289,
+      "val_r2": 0.956068217754364,
+      "best_epoch": 42,
+      "fit_time_sec": 10.21
+    },
+    {
+      "model_family": "FlowCastGRU",
+      "trial_id": "GRU_Standard_1L",
+      "params": {
+        "trial_name": "GRU_Standard_1L",
+        "hidden_dim": 64,
+        "num_layers": 1,
+        "context_dim": 32,
+        "dropout": 0.15,
+        "lr": 0.002,
+        "batch_size": 32
+      },
+      "val_mae": 0.030394209548830986,
+      "val_rmse": 0.04164937136611516,
+      "val_r2": 0.9560192227363586,
+      "best_epoch": 18,
+      "fit_time_sec": 5.15
+    },
+    {
+      "model_family": "FlowCastGRU",
+      "trial_id": "GRU_Deep_2L_Baseline",
+      "params": {
+        "trial_name": "GRU_Deep_2L_Baseline",
+        "hidden_dim": 64,
+        "num_layers": 2,
+        "context_dim": 32,
+        "dropout": 0.15,
+        "lr": 0.002,
+        "batch_size": 32
+      },
+      "val_mae": 0.029446866363286972,
+      "val_rmse": 0.04089119178436012,
+      "val_r2": 0.9576058983802795,
+      "best_epoch": 47,
+      "fit_time_sec": 14.1
+    },
+    {
+      "model_family": "FlowCastGRU",
+      "trial_id": "GRU_HighRegularization_2L",
+      "params": {
+        "trial_name": "GRU_HighRegularization_2L",
+        "hidden_dim": 64,
+        "num_layers": 2,
+        "context_dim": 32,
+        "dropout": 0.25,
+        "lr": 0.001,
+        "batch_size": 32
+      },
+      "val_mae": 0.029890749603509903,
+      "val_rmse": 0.04175737343727715,
+      "val_r2": 0.9557908177375793,
+      "best_epoch": 36,
+      "fit_time_sec": 12.82
+    },
+    {
+      "model_family": "FlowCastGRU",
+      "trial_id": "GRU_HighCapacity_2L",
+      "params": {
+        "trial_name": "GRU_HighCapacity_2L",
+        "hidden_dim": 128,
+        "num_layers": 2,
+        "context_dim": 32,
+        "dropout": 0.2,
+        "lr": 0.002,
+        "batch_size": 32
+      },
+      "val_mae": 0.029739635065197945,
+      "val_rmse": 0.04111976968755813,
+      "val_r2": 0.9571306109428406,
+      "best_epoch": 31,
+      "fit_time_sec": 12.73
+    },
+    {
+      "model_family": "FlowCastGRU",
+      "trial_id": "GRU_SmallBatch_2L",
+      "params": {
+        "trial_name": "GRU_SmallBatch_2L",
+        "hidden_dim": 64,
+        "num_layers": 2,
+        "context_dim": 32,
+        "dropout": 0.15,
+        "lr": 0.002,
+        "batch_size": 16
+      },
+      "val_mae": 0.030074380338191986,
+      "val_rmse": 0.04108031314743993,
+      "val_r2": 0.9572128653526306,
+      "best_epoch": 19,
+      "fit_time_sec": 17.64
+    },
+    {
+      "model_family": "FlowCastGRU",
+      "trial_id": "GRU_Compact_2L",
+      "params": {
+        "trial_name": "GRU_Compact_2L",
+        "hidden_dim": 32,
+        "num_layers": 2,
+        "context_dim": 16,
+        "dropout": 0.1,
+        "lr": 0.002,
+        "batch_size": 32
+      },
+      "val_mae": 0.030100099742412567,
+      "val_rmse": 0.041417420259333926,
+      "val_r2": 0.9565077424049377,
+      "best_epoch": 25,
+      "fit_time_sec": 9.94
+    },
+    {
+      "model_family": "FlowCastGRU",
+      "trial_id": "GRU_Wide_1L_LowLR",
+      "params": {
+        "trial_name": "GRU_Wide_1L_LowLR",
+        "hidden_dim": 128,
+        "num_layers": 1,
+        "context_dim": 32,
+        "dropout": 0.15,
+        "lr": 0.001,
+        "batch_size": 32
+      },
+      "val_mae": 0.029492344707250595,
+      "val_rmse": 0.041087650738919936,
+      "val_r2": 0.9571975469589233,
+      "best_epoch": 42,
+      "fit_time_sec": 9.49
+    }
+  ]
+}
