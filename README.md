@@ -5,180 +5,116 @@
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.35%2B-FF4B4B.svg)](https://streamlit.io/)
 [![License: CC BY 4.0](https://img.shields.io/badge/License-CC_BY_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
 
-> **Problem Statement (L2)**: Smart Traffic Management System for Urban Congestion  
-> **Academic Scope**: Deep Learning Mini Project (7th Semester CSE, VTU/CMRIT Curriculum)  
-> **Notice**: This is an academic research prototype evaluated on highway arterial sensor datasets in Northern Virginia / Washington, D.C. It does not claim real-world signal preemption or validation on heterogeneous Indian road networks.
+FlowCast is an open-source deep learning forecasting system that predicts arterial highway traffic volume 15 minutes into the future across a network of 36 inductive loop detector stations. Built on historical time-series sequences and contextual calendar indicators, FlowCast pairs continuous regression with statistically derived traffic-volume bands (Low, Moderate, High) to provide interpretable traffic insights via an interactive dashboard.
 
 ---
 
-## 1. Project Overview
+## Key Features
 
-**FlowCast** is a reproducible, deep learning-based short-horizon traffic forecasting system. It predicts traffic volume **15 minutes into the future** across a network of **36 highway loop detector stations** using historical observations and contextual features, and translates continuous forecasts into interpretable **traffic-volume bands** (Low, Moderate, High).
-
-Key Features:
-- **Zero-Leakage Temporal Pipeline**: Enforces chronological ordering across train ($1,061$ steps), validation ($200$ steps), and held-out test ($840$ steps) sets without temporal shuffling.
-- **Dual-Branch Spatio-Temporal GRU**: Consumes a genuine 10-lag historical sequence ($150$ minutes of readings) through a 2-layer GRU while encoding day/hour periodicities through an auxiliary contextual MLP.
-- **Statistically Derived Categories**: Traffic-volume bands are derived strictly from training set tertiles ($0.1822$ and $0.3895$), ensuring zero test-set data leakage.
-- **Interactive Streamlit Dashboard**: Provides live next-15m forecasting, sensor-level inspection, a bundled demonstration mode with real test instances, and benchmark comparisons.
+- **Multi-Output Spatio-Temporal Forecasting**: Predicts next-15-minute traffic volumes simultaneously for all 36 network sensors.
+- **Dual-Branch Recurrent Neural Architecture**: Consumes genuine 10-step historical sequences ($150$ minutes) via a 2-layer Gated Recurrent Unit (GRU) alongside an auxiliary Multi-Layer Perceptron (MLP) for day/hour periodicities.
+- **Zero-Leakage Experimental Design**: Maintains strict chronological train/validation/test ordering and derives traffic-volume band thresholds exclusively from training data.
+- **Conventional ML Benchmark**: Includes an optimized multi-output Random Forest regressor for baseline comparison.
+- **Interactive Web Interface**: Streamlit dashboard with bundled demonstration scenarios, custom parameter tweaking, and CSV file upload.
 
 ---
 
-## 2. Dataset Attribution & Audit
+## Technology Stack
 
-FlowCast utilizes the benchmark **Traffic Flow Forecasting** dataset from the UCI Machine Learning Repository:
-- **UCI Dataset ID**: [734](https://archive.ics.uci.edu/dataset/734/traffic%2Bflow%2Bforecasting)
+- **Deep Learning**: PyTorch (with Apple Silicon MPS, CUDA, and CPU support)
+- **Machine Learning & Metrics**: Scikit-Learn, SciPy, NumPy, Pandas
+- **Visualization**: Matplotlib, Seaborn
+- **Application & Serving**: Streamlit
+- **Testing**: Pytest
+
+---
+
+## Dataset Attribution
+
+This project uses the public **Traffic Flow Forecasting** dataset from the UCI Machine Learning Repository:
+- **Repository Link**: [UCI Dataset 734: Traffic Flow Forecasting](https://archive.ics.uci.edu/dataset/734/traffic%2Bflow%2Bforecasting)
 - **DOI**: [10.1145/3339823](https://doi.org/10.1145/3339823)
-- **License**: Creative Commons Attribution 4.0 International (CC BY 4.0)
-- **Citation**:
-  > Liang Zhao, Olga Gkountouna, and Dieter Pfoser. 2019. *Spatial Auto-regressive Dependency Interpretable Learning Based on Spatial Topological Constraints*. ACM Transactions on Spatial Algorithms and Systems (TSAS), Vol. 5, No. 3, Article 19 (August 2019).
-- **Physical Sensor Context**: 36 loop sensor locations along I-66 and I-395/Route 50 in Northern Virginia and Washington, D.C.
-- **Temporal Resolution**: 15-minute sampling frequency over 2,101 continuous timestamps ($75,636$ sensor readings). Missing values: 0 (0.00%).
+- **License**: [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/)
+- **Citation**: Liang Zhao, Olga Gkountouna, and Dieter Pfoser. *Spatial Auto-regressive Dependency Interpretable Learning Based on Spatial Topological Constraints*. ACM Transactions on Spatial Algorithms and Systems (TSAS), Vol. 5, No. 3, Article 19 (August 2019).
 
-For full details, see [`docs/dataset_audit.md`](file:///Users/mdzaidibrahim/Dev/College%20Projects/ML%20&%20DL%20projects/DL%20mini%207th%20sem/docs/dataset_audit.md).
+*Note: The dataset represents inductive loop detectors along major highways (I-66 and I-395/US-50) in Northern Virginia and Washington, D.C. FlowCast is an academic forecasting prototype, not a production traffic-control system deployed on Indian roads.*
 
 ---
 
-## 3. System Architecture
+## Prerequisites
 
-```
-                  Input: 10-Step Historical Sequence
-                    X_seq ∈ R^(B × 10 × 36)
-                              │
-                              ▼
-                   ┌───────────────────────┐
-                   │  2-Layer Gated        │
-                   │  Recurrent Unit (GRU) │
-                   │  Hidden Dim = 64      │
-                   │  Dropout = 0.15       │
-                   └───────────────────────┘
-                              │
-                              ▼
-                   Temporal Embedding h_temp ∈ R^(B × 64)
-                              │
-       Input Context          │
-       c_t ∈ R^(B × 29)       │
-            │                 │
-            ▼                 │
-   ┌─────────────────┐        │
-   │ Contextual MLP  │        │
-   │ Linear(29, 32)  │        │
-   │ ReLU + Dropout  │        │
-   │ Linear(32, 32)  │        │
-   │ ReLU            │        │
-   └─────────────────┘        │
-            │                 │
-            ▼                 │
-   Context Embedding h_ctx ───┴───► Spatio-Temporal Fusion
-   ∈ R^(B × 32)                     Concatenation: [h_temp || h_ctx]
-                                    ∈ R^(B × 96)
-                                              │
-                                              ▼
-                                    ┌───────────────────┐
-                                    │ Dense Fusion Head │
-                                    │ Linear(96, 64)    │
-                                    │ ReLU + Dropout    │
-                                    │ Linear(64, 36)    │
-                                    │ Sigmoid Output    │
-                                    └───────────────────┘
-                                              │
-                                              ▼
-                                    Forecast: y_pred ∈ [0, 1]^(B × 36)
-```
+- **Git**
+- **Python 3.10 – 3.13**
 
 ---
 
-## 4. Experimental Results
+## Quick Start
 
-Evaluated on the held-out test horizon of **840 continuous quarter-hours** ($30,240$ individual station observations):
+### Windows (PowerShell)
 
-### Continuous Regression Metrics (Network-Wide)
-
-| Model Architecture | MAE (↓) | RMSE (↓) | $R^2$ Score (↑) | Training Time |
-| :--- | :---: | :---: | :---: | :---: |
-| **Random Forest Baseline** (100 Trees, Depth 16) | **0.0320** | **0.0475** | **0.9460** | 2.02 s |
-| **FlowCast GRU** (2-Layer Recurrent + Context MLP) | 0.0374 | 0.0531 | 0.9325 | 10.62 s |
-
-### Derived Traffic-Volume Band Classification Metrics
-
-*Thresholds derived strictly from training set tertiles: Low ($\le 0.1822$), Moderate ($0.1822 - 0.3895$), High ($> 0.3895$).*
-
-| Model Architecture | Precision | Recall | Macro-F1 (↑) | Accuracy (↑) |
-| :--- | :---: | :---: | :---: | :---: |
-| **Random Forest Baseline** | **0.9065** | **0.9066** | **0.9065** | **90.53%** |
-| **FlowCast GRU** | 0.8899 | 0.8893 | 0.8894 | 88.87% |
-
-*All reported metrics are generated strictly from actual model evaluations on the held-out test set.*
-
----
-
-## 5. Repository Structure
-
-```
-FlowCast/
-├── app.py                      # Interactive Streamlit dashboard
-├── requirements.txt            # Pinned project dependencies
-├── pytest.ini                  # Pytest configuration
-├── README.md                   # Project overview & documentation
-├── .gitignore                  # Git exclusion rules
-├── src/
-│   ├── data/
-│   │   ├── load_data.py        # Automated UCI dataset downloader & parser
-│   │   └── preprocess.py       # Zero-leakage temporal splitter & feature extractor
-│   ├── models/
-│   │   ├── baseline.py         # Multi-output Random Forest regressor
-│   │   ├── gru_model.py        # Spatio-Temporal Dual-Branch GRU
-│   │   ├── train.py            # End-to-end training pipeline & checkpointing
-│   │   └── predict.py          # Unified inference & category translation wrapper
-│   └── evaluation/
-│       ├── metrics.py          # Regression & classification metric computers
-│       └── plots.py            # Diagnostic plotting utilities
-├── tests/
-│   └── test_pipeline.py        # Automated test suite (5 passing tests)
-├── notebooks/
-│   └── FlowCast_EDA_and_Pipeline.ipynb  # Reproducible walkthrough notebook
-├── docs/
-│   ├── dataset_audit.md        # Detailed schema audit and citation record
-│   ├── methodology.md          # Mathematical formulation and architecture specs
-│   └── report_outline.md       # 30-page university report outline
-└── artifacts/
-    ├── figures/                # Saved diagnostic plots
-    ├── metrics/                # Raw metric evaluation summary JSON
-    ├── models/                 # Serialized weights (baseline & GRU)
-    └── outputs/                # Demonstration sample test instances
+```powershell
+git clone https://github.com/mdzaidibrahim/FlowCast.git
+cd FlowCast
+py -m venv .venv
+.\.venv\Scripts\python.exe -m pip install --upgrade pip
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe run.py
 ```
 
----
+### macOS / Linux (Terminal)
 
-## 6. Getting Started & Local Execution
-
-### 1. Clone & Set Up Virtual Environment
 ```bash
-git clone <repo-url> FlowCast
+git clone https://github.com/mdzaidibrahim/FlowCast.git
 cd FlowCast
 python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+./.venv/bin/python -m pip install --upgrade pip
+./.venv/bin/python -m pip install -r requirements.txt
+./.venv/bin/python run.py
 ```
 
-### 2. Run Automated Test Suite
-```bash
-pytest tests/ -v
-```
+### What Happens on First Run
 
-### 3. Run End-to-End Training & Artifact Generation
-```bash
-python3 -m src.models.train
-```
-
-### 4. Launch the Interactive Streamlit Dashboard
-```bash
-streamlit run app.py
-```
-Open [http://localhost:8501](http://localhost:8501) in your browser.
+When you execute `run.py` for the first time:
+1. It automatically downloads the raw UCI dataset archive from the official UCI repository and verifies file integrity.
+2. If trained weights are missing, it runs the training pipeline to fit the Random Forest baseline and FlowCast GRU model (takes ~10–15 seconds on modern hardware).
+3. It launches the interactive Streamlit dashboard in your default browser at `http://localhost:8501`. Subsequent runs launch the app immediately using saved model weights without retraining.
 
 ---
 
-## 7. Documentation & Report Outline
-- [`docs/dataset_audit.md`](file:///Users/mdzaidibrahim/Dev/College%20Projects/ML%20&%20DL%20projects/DL%20mini%207th%20sem/docs/dataset_audit.md): Complete schema audit, sensor locations, feature mapping, and raw distribution analysis.
-- [`docs/methodology.md`](file:///Users/mdzaidibrahim/Dev/College%20Projects/ML%20&%20DL%20projects/DL%20mini%207th%20sem/docs/methodology.md): Mathematical formulations, recurrent equations, and training dynamics.
-- [`docs/report_outline.md`](file:///Users/mdzaidibrahim/Dev/College%20Projects/ML%20&%20DL%20projects/DL%20mini%207th%20sem/docs/report_outline.md): Detailed 30-page university project report outline structured for VTU/IEEE formatting.
+## Running Tests
+
+To run the automated test suite verifying dataset loading, leakage safeguards, model shapes, and inference:
+
+```bash
+# Windows
+.\.venv\Scripts\python.exe -m pytest tests/ -v
+
+# macOS / Linux
+./.venv/bin/python -m pytest tests/ -v
+```
+
+---
+
+## Troubleshooting
+
+- **Port in Use**: If port 8501 is already occupied, specify an alternate port:
+  ```bash
+  python run.py --port 8502
+  ```
+- **Force Retraining**: To retrain both models from scratch and regenerate evaluation plots:
+  ```bash
+  python run.py --retrain
+  ```
+- **Check Environment Without Starting UI**:
+  ```bash
+  python run.py --check-only
+  ```
+- **Windows Python Command**: If `py` is not recognized on Windows, use `python -m venv .venv` instead.
+
+---
+
+## Academic Documentation
+
+- Detailed mathematical formulation and network architecture: [docs/methodology.md](docs/methodology.md)
+- Complete dataset schema and sensor location audit: [docs/dataset_audit.md](docs/dataset_audit.md)
+- University project report blueprint and section outline: [docs/report_outline.md](docs/report_outline.md)

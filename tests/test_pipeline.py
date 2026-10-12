@@ -118,3 +118,16 @@ def test_saved_model_loading_and_inference():
     assert res_rf["all_predictions"].shape == (36,)
     assert 0.0 <= res_rf["sensor_prediction"] <= 1.0
     assert res_rf["sensor_category"] in ["Low Volume", "Moderate Volume", "High Volume"]
+
+
+def test_launcher_verification():
+    """Verify run.py launcher helper functions locate files properly."""
+    import run
+
+    mat_file = run.check_and_prepare_dataset()
+    assert mat_file.exists() and mat_file.stat().st_size > 1_000_000
+
+    # Test artifact verification
+    run.check_and_prepare_artifacts(force_retrain=False)
+    for art in run.REQUIRED_ARTIFACTS:
+        assert art.exists() and art.stat().st_size > 0

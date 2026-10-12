@@ -12,16 +12,24 @@ __pycache__/
 .coverage
 htmlcov/
 
-# Raw dataset archives & binary data
+# Raw dataset archives & binary data (auto-downloaded on first run)
 data/raw/*
 !data/raw/.gitkeep
 !data/raw/Traffic Flow Prediction Dataset.docx
 
-# Large model checkpoints
+# Model weights (auto-trained in ~10-15s if not present)
 artifacts/models/*
 !artifacts/models/.gitkeep
 
-# IDE and OS
+# Local evaluation & private assignment notes
+docs/*.pdf
+docs/Decisions&guidelines.md
+docs/doc.md
+docs/sample_report.md
+
+# IDE, OS, and temporary files
 .DS_Store
 .idea/
 .vscode/
+*.swp
+*.swo

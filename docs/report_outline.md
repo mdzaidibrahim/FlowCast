@@ -1,6 +1,6 @@
 # FlowCast: University Mini Project Report Outline (30-Page Structure)
 
-**Course**: Deep Learning Mini Project (7th Semester)  
+**Course**: Deep Learning Project  
 **Problem Statement Code**: L2 — Smart Traffic Management System for Urban Congestion  
 **Project Title**: FlowCast: Deep Learning-Based Short-Horizon Traffic Flow Forecasting and Congestion Risk Classification  
 **Target Format**: VTU CMRIT Mini Project Guidelines / IEEE Computer Society Transactions Template  
