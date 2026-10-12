@@ -11,6 +11,31 @@ FlowCast is an open-source deep learning forecasting system that predicts arteri
 
 ---
 
+## Table of Contents
+
+- [What Problem FlowCast Solves](#what-problem-flowcast-solves)
+- [What the Application Predicts and How the Pipeline Works](#what-the-application-predicts-and-how-the-pipeline-works)
+- [Technology Stack and Responsibilities](#technology-stack-and-responsibilities)
+- [Performance Benchmarks](#performance-benchmarks)
+- [Prerequisites](#prerequisites)
+- [Installation and Launch Instructions](#installation-and-launch-instructions)
+  - [Windows (PowerShell)](#windows-powershell)
+  - [macOS / Linux (Terminal)](#macos--linux-terminal)
+- [First-Run Behavior and Startup Flow](#first-run-behavior-and-startup-flow)
+- [Dashboard Guide](#dashboard-guide)
+  - [Demonstration Mode](#demonstration-mode)
+  - [Custom Scenario Builder](#custom-scenario-builder)
+  - [CSV Batch Input and Schema](#csv-batch-input-and-schema)
+  - [Model Comparison & Diagnostics](#model-comparison--diagnostics)
+  - [Architecture & Audit](#architecture--audit)
+- [Running Automated Tests](#running-automated-tests)
+- [Troubleshooting](#troubleshooting)
+- [Academic Documentation](#academic-documentation)
+- [License and Attribution](#license-and-attribution)
+- [Design Decisions: Why These Choices?](#design-decisions-why-these-choices)
+
+---
+
 ## What Problem FlowCast Solves
 
 Traffic congestion on metropolitan arterial corridors is highly dynamic, non-linear, and spatially interdependent. Conventional municipal operations often rely on historical static averages or reactive sensor alerts that detect congestion only after queues have formed. 
@@ -49,31 +74,6 @@ FlowCast addresses **short-horizon traffic flow forecasting** (official problem 
 | **Matplotlib & Seaborn** | Generation of publication-quality diagnostic plots (loss curves, sensor forecasts, confusion matrices, and model comparison bar charts). |
 | **Streamlit (v1.35+)** | Interactive analytical dashboard; serves live forecasting, scenario tweaking, CSV batch testing, and diagnostic inspections. |
 | **Pytest** | Automated unit and integration testing suite verifying zero-leakage splits, feature mapping, model shapes, and inference stability. |
-
----
-
-## Table of Contents
-
-- [What Problem FlowCast Solves](#what-problem-flowcast-solves)
-- [What the Application Predicts and How the Pipeline Works](#what-the-application-predicts-and-how-the-pipeline-works)
-- [Technology Stack and Responsibilities](#technology-stack-and-responsibilities)
-- [Performance Benchmarks](#performance-benchmarks)
-- [Prerequisites](#prerequisites)
-- [Installation and Launch Instructions](#installation-and-launch-instructions)
-  - [Windows (PowerShell)](#windows-powershell)
-  - [macOS / Linux (Terminal)](#macos--linux-terminal)
-- [First-Run Behavior and Startup Flow](#first-run-behavior-and-startup-flow)
-- [Dashboard Guide](#dashboard-guide)
-  - [Demonstration Mode](#demonstration-mode)
-  - [Custom Scenario Builder](#custom-scenario-builder)
-  - [CSV Batch Input and Schema](#csv-batch-input-and-schema)
-  - [Model Comparison & Diagnostics](#model-comparison--diagnostics)
-  - [Architecture & Audit](#architecture--audit)
-- [Running Automated Tests](#running-automated-tests)
-- [Troubleshooting](#troubleshooting)
-- [Academic Documentation](#academic-documentation)
-- [License and Attribution](#license-and-attribution)
-- [Design Decisions: Why These Choices?](#design-decisions-why-these-choices)
 
 ---
 
