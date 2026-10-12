@@ -38,7 +38,35 @@ def download_dataset_if_needed(raw_dir: Path | str = "data/raw") -> Path:
     zip_file = raw_dir / "traffic_flow_forecasting.zip"
     if not zip_file.exists() or zip_file.stat().st_size < 1_000_000:
         print(f"Downloading dataset from {UCI_DOWNLOAD_URL}...")
-        urllib.request.urlretrieve(UCI_DOWNLOAD_URL, zip_file)
+        download_success = False
+
+        # Method 1: requests (standard, uses certifi bundle)
+        try:
+            import requests
+
+            resp = requests.get(UCI_DOWNLOAD_URL, stream=True, timeout=60)
+            resp.raise_for_status()
+            with open(zip_file, "wb") as f:
+                for chunk in resp.iter_content(chunk_size=65536):
+                    if chunk:
+                        f.write(chunk)
+            download_success = True
+        except Exception as e:
+            print(f"[FlowCast Warning] requests download failed ({e}), trying urllib with certifi...")
+
+        # Method 2: urllib with SSL context fallback
+        if not download_success:
+            import ssl
+
+            try:
+                import certifi
+
+                ctx = ssl.create_default_context(cafile=certifi.where())
+            except Exception:
+                ctx = ssl._create_unverified_context()
+
+            with urllib.request.urlopen(UCI_DOWNLOAD_URL, context=ctx) as u_resp, open(zip_file, "wb") as f:
+                f.write(u_resp.read())
 
     print(f"Extracting {zip_file}...")
     with zipfile.ZipFile(zip_file, "r") as zf:
