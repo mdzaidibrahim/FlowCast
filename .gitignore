@@ -12,15 +12,13 @@ __pycache__/
 .coverage
 htmlcov/
 
-# Raw dataset archives
-data/raw/*.zip
-data/raw/__MACOSX/
+# Raw dataset archives & binary data
+data/raw/*
+!data/raw/.gitkeep
+!data/raw/Traffic Flow Prediction Dataset.docx
 
-# Model checkpoints / large artifacts if needed
-*.pth
-*.pt
-*.pkl
-*.joblib
+# Large model checkpoints
+artifacts/models/*
 !artifacts/models/.gitkeep
 
 # IDE and OS
