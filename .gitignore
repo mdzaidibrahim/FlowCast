@@ -1,0 +1,29 @@
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Raw dataset archives
+data/raw/*.zip
+data/raw/__MACOSX/
+
+# Model checkpoints / large artifacts if needed
+*.pth
+*.pt
+*.pkl
+*.joblib
+!artifacts/models/.gitkeep
+
+# IDE and OS
+.DS_Store
+.idea/
+.vscode/
