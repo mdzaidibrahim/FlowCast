@@ -119,10 +119,14 @@ def load_metrics_and_samples():
         with open(metrics_file, "r", encoding="utf-8") as f:
             metrics_data = json.load(f)
 
-    samples_data = []
+    samples_list = []
     if samples_file.exists():
         with open(samples_file, "r", encoding="utf-8") as f:
-            samples_data = json.load(f)
+            raw_samples = json.load(f)
+            if isinstance(raw_samples, dict) and "samples" in raw_samples:
+                samples_list = raw_samples["samples"]
+            elif isinstance(raw_samples, list):
+                samples_list = raw_samples
 
     sensor_metadata = {}
     if meta_file.exists():
@@ -145,7 +149,7 @@ def load_metrics_and_samples():
                 "road_id": [0] * 36,
             }
 
-    return metrics_data, samples_data, sensor_metadata
+    return metrics_data, samples_list, sensor_metadata
 
 
 def main():
@@ -225,22 +229,30 @@ def render_forecasting_dashboard(predictor, samples_data, sensor_metadata, activ
     with tab_demo:
         st.write("Evaluate live inference on real held-out test steps from the benchmark dataset:")
         if samples_data:
-            demo_names = [
-                f"Test Step t={s['test_sample_index']} (Actual Corridor Vol: {s['actual_mean_volume']:.3f})"
-                for s in samples_data
-            ]
+            demo_names = []
+            for s in samples_data:
+                idx_val = s.get("test_index", s.get("test_sample_index", 0))
+                y_arr = s.get("y_true", s.get("sensor_actual", [0.0]))
+                mean_vol = float(np.mean(y_arr))
+                demo_names.append(f"Test Step t={idx_val} (Actual Corridor Vol: {mean_vol:.3f})")
+
             selected_idx = st.selectbox("Select Benchmark Scenario:", range(len(samples_data)), format_func=lambda i: demo_names[i])
             curr_s = samples_data[selected_idx]
-            y_actual = np.array(curr_s["sensor_actual"])
+            y_actual = np.array(curr_s.get("y_true", curr_s.get("sensor_actual")))
 
-            # Load matching raw sequence from test split
-            from src.data.preprocess import prepare_data_splits
-            splits = prepare_data_splits(val_size=200)
-            idx = curr_s["test_sample_index"]
-            x_seq = splits.X_test_seq[idx]
-            x_ctx = splits.X_test_ctx[idx]
-            x_flat = splits.X_test_flat[idx]
-            # Extract hour
+            # Load sequence and context directly from sample if present
+            if "x_seq" in curr_s and "x_ctx" in curr_s:
+                x_seq = np.array(curr_s["x_seq"], dtype=np.float32)
+                x_ctx = np.array(curr_s["x_ctx"], dtype=np.float32)
+                x_flat = np.array(curr_s.get("x_flat", build_x_flat_from_inputs(x_seq, x_ctx, sensor_metadata)), dtype=np.float32)
+            else:
+                from src.data.preprocess import prepare_data_splits
+                splits = prepare_data_splits(val_size=200)
+                idx = int(curr_s.get("test_index", curr_s.get("test_sample_index", 0)))
+                x_seq = splits.X_test_seq[idx]
+                x_ctx = splits.X_test_ctx[idx]
+                x_flat = splits.X_test_flat[idx]
+
             sel_hour = int(np.argmax(x_ctx[5:29]))
         else:
             st.warning("Demo samples not loaded. Using default synthetic sample.")

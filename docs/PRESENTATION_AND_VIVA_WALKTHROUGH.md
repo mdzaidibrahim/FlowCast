@@ -160,3 +160,4 @@ streamlit run app.py
 ### Q5: "What is the purpose of the Multi-Head Attention layer in your network?"
 **Answer**:
 > *"While TCN filters capture local feature shapes, not all historical timesteps are equally important. For example, when forecasting traffic at 8:00 AM, the sharp acceleration that occurred at 7:45 AM carries far more predictive signal than quiet readings from 5:30 AM. Our 4-head scaled dot-product attention layer computes dynamic weights across the historical sequence, allowing the model to focus on critical rush-hour transitions."*
+

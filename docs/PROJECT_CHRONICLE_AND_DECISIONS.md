@@ -271,3 +271,4 @@ We constructed a suite of 28 automated unit and integration tests across 4 test 
 | **Data Splitting** | Strict Chronological Split (1061 / 200 / 840) | Random `train_test_split(shuffle=True)` | Random shuffling creates temporal leakage, causing the model to cheat by looking into the future. |
 | **Categorization Boundaries** | Empirical Tertile Percentiles ($P_{33.3}, P_{66.7}$) on Train | Arbitrary cutoffs (e.g., 0.33, 0.66) | Reflects real-world traffic distribution balance without data leakage. |
 | **Deployment Frontend** | Streamlit Web Application | Flask API / Command Line only | Satisfies guidelines requiring an interactive visual dashboard for viva presentation. |
+

@@ -112,3 +112,4 @@ def compute_green_wave_advisory(
         "recommended_speed_kmh": np.round(np.clip(recommended_speed, 40.0, 100.0), 1),
         "metering_active": mask_high,
     }
+

@@ -87,3 +87,4 @@ def test_predictor_multimodal_pipeline():
     assert "sensor_ev_surge_index" in res
     assert "recommended_speed_kmh" in res
     assert 0.0 <= res["sensor_prediction"] <= 1.0
+
